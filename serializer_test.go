@@ -18,7 +18,8 @@ type SubBusinessObj struct {
 	IntField          int            `fauna:"int_field"`
 	DoubleField       float64        `fauna:"double_field"`
 
-	IgnoredField2 string
+	IgnoredField2         string
+	IgnoredFieldExplicit2 string `fauna:"-"`
 }
 
 type DocBusinessObj struct {
@@ -45,7 +46,8 @@ type BusinessObj struct {
 	DocField      DocBusinessObj      `fauna:"doc_field"`
 	NamedDocField NamedDocBusinessObj `fauna:"named_doc_field"`
 
-	IgnoredField string
+	IgnoredField         string
+	IgnoredFieldExplicit string `fauna:"-"`
 }
 
 func marshalAndCheck(t *testing.T, obj any) []byte {
@@ -307,6 +309,17 @@ func TestEncodingStructs(t *testing.T) {
 			IgnoredField: "",
 		}
 		roundTripCheck(t, obj, `{"Field":"foo"}`)
+	})
+
+	t.Run("ignores fields tagged with '-'", func(t *testing.T) {
+		obj := struct {
+			Field        string `fauna:""`
+			IgnoredField string `fauna:"-"`
+		}{
+			Field:        "egg",
+			IgnoredField: "",
+		}
+		roundTripCheck(t, obj, `{"Field":"egg"}`)
 	})
 
 	t.Run("encodes nested fields", func(t *testing.T) {

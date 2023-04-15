@@ -611,6 +611,10 @@ func encodeStruct(s any) (any, error) {
 
 		tags := strings.Split(tag, ",")
 
+		if len(tags) >= 1 && tags[0] == "-" {
+			continue
+		}
+
 		typeHint := ""
 		if len(tags) > 1 {
 			typeHint = tags[1]
